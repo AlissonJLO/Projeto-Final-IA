@@ -1,5 +1,6 @@
 import random
 import copy
+import json
 
 ouros = {
     "Áries" : 50,
@@ -23,6 +24,23 @@ bronzes = {
     "Shun": 1.2,
     "Ikki": 1.1
 }
+
+
+def sincronizar_com_gui():
+    global ouros, bronzes  # Avisamos o Python que vamos atualizar as globais
+    try:
+        with open("input.json", "r", encoding="utf-8") as f:
+            dados_gui = json.load(f)
+
+            # O segredo está aqui: o método .update() substitui os valores
+            # sem mudar o tipo da variável ou o nome.
+            ouros.update(dados_gui["config_ouros"])
+            bronzes.update(dados_gui["config_bronzes"])
+
+        print("Dados da GUI sincronizados com sucesso.")
+    except Exception as e:
+        # Se o arquivo não existir ou o JSON estiver errado, ele usa o fixo
+        print(f"Aviso: Usando dicionários fixos (Erro: {e})")
 
 # 1 = Lutando, 0 = Descansando
 # [Seiya, Shiryu, Hyoga, Shun, Ikki]
@@ -110,12 +128,6 @@ def pop_inicial(tamanho_populacao):
         populacao_avaliada.append([novo_individuo, nota])
 
     return populacao_avaliada
-
-
-# Gera a população de teste
-populacao_atual = pop_inicial(3000)
-
-
 def crossover(pai1, pai2):
     # Sorteia dois pontos aleatórios para "fatiar" o DNA
     p1 = random.randint(1, 5)
@@ -141,7 +153,6 @@ def mutacao(dna, taxa_mutacao=0.05):
                 dna[i][j] = 1 if dna[i][j] == 0 else 0
 
     return dna
-
 
 def reparar_individuo(dna):
     energia_maxima = 5
@@ -185,28 +196,39 @@ def gerar_proxima_geracao(populacao_atual, tamanho_pop=1000):
 
 # --- INICIANDO A MÁQUINA ---
 
-num_geracoes = 1000  # Quantas vezes a evolução vai rodar
+if __name__ == "__main__":
+    sincronizar_com_gui() # Atualiza as forças antes de criar a pop_inicial
 
-print(f"Iniciando evolução... População Inicial: {len(populacao_atual)} indivíduos.")
+    # Gera a população de teste
+    populacao_atual = pop_inicial(1000)
 
-for g in range(num_geracoes):
-    # Gera a nova população a partir da atual
-    populacao_atual = gerar_proxima_geracao(populacao_atual)
+    num_geracoes = 100 # Quantas vezes a evolução vai rodar
 
-    # Como a função já ordena, o melhor está sempre no índice 0
-    melhor_tempo = populacao_atual[0][1]
+    print(f"Iniciando evolução... População Inicial: {len(populacao_atual)} indivíduos.")
 
-    # Printa o progresso a cada geração
-    print(f"Geração {g:03d} | Melhor Tempo: {melhor_tempo:.2f}")
+    for g in range(num_geracoes):
+        # Gera a nova população a partir da atual
+        populacao_atual = gerar_proxima_geracao(populacao_atual)
 
-# --- RESULTADO FINAL ---
+        # Como a função já ordena, o melhor está sempre no índice 0
+        melhor_tempo = populacao_atual[0][1]
 
-print("\n" + "=" * 30)
-print("EVOLUÇÃO CONCLUÍDA")
-print(f"Melhor tempo alcançado: {populacao_atual[0][1]:.2f} min")
-print("Estratégia (Matriz 12x5):")
-for linha in populacao_atual[0][0]:
-    print(linha)
-print("=" * 30)
+        # Printa o progresso a cada geração
+        print(f"Geração {g:03d} | Melhor Tempo: {melhor_tempo:.2f}")
+
+    # --- RESULTADO FINAL ---
+
+    print("\n" + "=" * 30)
+    print("EVOLUÇÃO CONCLUÍDA")
+    print(f"Melhor tempo alcançado: {populacao_atual[0][1]:.2f} min")
+    print("Estratégia (Matriz 12x5):")
+    for linha in populacao_atual[0][0]:
+        print(linha)
+    print("=" * 30)
+
+    # --- EXPORTAR PARA ARQUIVO DE SAÍDA ---
+    with open("output.json", "w") as f:
+        # Salvamos apenas a matriz do campeão
+        json.dump({"dna_campeao": populacao_atual[0][0]}, f)
 
 
