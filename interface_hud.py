@@ -152,7 +152,7 @@ class InterfaceTatica:
         pygame.display.flip()
 
 
-def main():
+def iniciar_interface():
     # 1. Instancia a lógica (Backend)
     motor = SimuladorLogica("coordernadasmapaco.csv", "input.json", "output.json")
 
@@ -160,7 +160,6 @@ def main():
     interface = InterfaceTatica(motor)
 
     rodando = True
-    print("Iniciando reprodução tática no mapa com caminho predefinido...")
 
     while rodando:
         for evento in pygame.event.get():
@@ -179,7 +178,3 @@ def main():
         interface.clock.tick(30)
 
     pygame.quit()
-
-
-if __name__ == "__main__":
-    main()
