@@ -3,27 +3,21 @@ import copy
 import json
 
 ouros = {
-    "Áries" : 50,
-    "Touro" : 55,
-    "Gêmeos" : 60,
-    "Câncer" : 70,
-    "Leão" : 75,
-    "Virgem" : 80,
-    "Libra" : 85,
-    "Escorpião" : 90,
-    "Sagitário" : 95,
-    "Capricórnio" : 100,
-    "Aquário" : 110,
-    "Peixes" : 120
+    "Áries": 50,
+    "Touro": 55,
+    "Gêmeos": 60,
+    "Câncer": 70,
+    "Leão": 75,
+    "Virgem": 80,
+    "Libra": 85,
+    "Escorpião": 90,
+    "Sagitário": 95,
+    "Capricórnio": 100,
+    "Aquário": 110,
+    "Peixes": 120,
 }
 
-bronzes = {
-    "Seiya": 1.5,
-    "Shiryu": 1.4,
-    "Hyoga": 1.3,
-    "Shun": 1.2,
-    "Ikki": 1.1
-}
+bronzes = {"Seiya": 1.5, "Shiryu": 1.4, "Hyoga": 1.3, "Shun": 1.2, "Ikki": 1.1}
 
 
 def sincronizar_com_gui():
@@ -42,12 +36,13 @@ def sincronizar_com_gui():
         # Se o arquivo não existir ou o JSON estiver errado, ele usa o fixo
         print(f"Aviso: Usando dicionários fixos (Erro: {e})")
 
+
 # 1 = Lutando, 0 = Descansando
 # [Seiya, Shiryu, Hyoga, Shun, Ikki]
 individuo = [
-    [1, 1, 0, 0, 0], # Áries
-    [0, 1, 1, 0, 0], # Touro
-    [0, 0, 1, 1, 0], # Gêmeos
+    [1, 1, 0, 0, 0],  # Áries
+    [0, 1, 1, 0, 0],  # Touro
+    [0, 0, 1, 1, 0],  # Gêmeos
     [0, 0, 0, 1, 1],  # Câncer
     [0, 0, 0, 0, 1],  # Leão
     [1, 1, 0, 0, 0],  # Virgem
@@ -63,11 +58,11 @@ nomes_bronzes = list(bronzes.keys())
 nomes_ouros = list(ouros.keys())
 
 
-def Fitness (individuo):
+def Fitness(individuo):
     tempo_total = 0
-    energia = [5,5,5,5,5]
+    energia = [5, 5, 5, 5, 5]
 
-    for  casas, lutas in enumerate(individuo):  # Itera sobre cada Luta
+    for casas, lutas in enumerate(individuo):  # Itera sobre cada Luta
         poder_ouro = ouros[nomes_ouros[casas]]
         poder_bronze = 0
 
@@ -75,8 +70,10 @@ def Fitness (individuo):
             if cavaleiro == 1:
                 poder_bronze += bronzes[nomes_bronzes[indice]]
                 energia[indice] -= 1
-        if poder_bronze > 0: # Evitar divisão por zero para preservar o programa em caso de have indivíduos com zero lutadores
-            tempo_total += poder_ouro/poder_bronze
+        if (
+            poder_bronze > 0
+        ):  # Evitar divisão por zero para preservar o programa em caso de have indivíduos com zero lutadores
+            tempo_total += poder_ouro / poder_bronze
         else:
             tempo_total += 1000
 
@@ -109,7 +106,7 @@ def Fitness (individuo):
     return 2000 + (erros_energia * 100) + tempo_total
 
 
-def gerar_individuo(): # Essa função e a de baixo são para implementar a população incial
+def gerar_individuo():  # Essa função e a de baixo são para implementar a população incial
     # Cria uma matriz 12x5 com 0 ou 1 aleatórios
     return [[(1 if random.random() < 0.3 else 0) for _ in range(5)] for _ in range(12)]
 
@@ -128,18 +125,22 @@ def pop_inicial(tamanho_populacao):
         populacao_avaliada.append([novo_individuo, nota])
 
     return populacao_avaliada
+
+
 def crossover(pai1, pai2):
     # Sorteia dois pontos aleatórios para "fatiar" o DNA
     p1 = random.randint(1, 5)
     p2 = random.randint(7, 11)
 
     import copy
+
     # O filho herda: [Pai1(Início), Pai2(Meio), Pai1(Fim)]
-    filho = copy.deepcopy(pai1[:p1]) + \
-            copy.deepcopy(pai2[p1:p2]) + \
-            copy.deepcopy(pai1[p2:])
+    filho = (
+        copy.deepcopy(pai1[:p1]) + copy.deepcopy(pai2[p1:p2]) + copy.deepcopy(pai1[p2:])
+    )
 
     return filho
+
 
 def mutacao(dna, taxa_mutacao=0.05):
     # 'dna' é a nossa matriz 12x5
@@ -154,11 +155,14 @@ def mutacao(dna, taxa_mutacao=0.05):
 
     return dna
 
+
 def reparar_individuo(dna):
     energia_maxima = 5
     for cavaleiro_idx in range(5):
         # Conta em quantas casas esse cavaleiro está lutando
-        lutas = [casa_idx for casa_idx in range(12) if dna[casa_idx][cavaleiro_idx] == 1]
+        lutas = [
+            casa_idx for casa_idx in range(12) if dna[casa_idx][cavaleiro_idx] == 1
+        ]
 
         # Se ele lutou mais que 5, "desligamos" casas aleatórias até chegar em 5
         while len(lutas) > energia_maxima:
@@ -166,6 +170,7 @@ def reparar_individuo(dna):
             dna[casa_para_remover][cavaleiro_idx] = 0
             lutas.remove(casa_para_remover)
     return dna
+
 
 def gerar_proxima_geracao(populacao_atual, tamanho_pop=1000):
     populacao_atual.sort(key=lambda x: x[1])
@@ -197,14 +202,16 @@ def gerar_proxima_geracao(populacao_atual, tamanho_pop=1000):
 # --- INICIANDO A MÁQUINA ---
 
 if __name__ == "__main__":
-    sincronizar_com_gui() # Atualiza as forças antes de criar a pop_inicial
+    sincronizar_com_gui()  # Atualiza as forças antes de criar a pop_inicial
 
     # Gera a população de teste
     populacao_atual = pop_inicial(1000)
 
-    num_geracoes = 100 # Quantas vezes a evolução vai rodar
+    num_geracoes = 100  # Quantas vezes a evolução vai rodar
 
-    print(f"Iniciando evolução... População Inicial: {len(populacao_atual)} indivíduos.")
+    print(
+        f"Iniciando evolução... População Inicial: {len(populacao_atual)} indivíduos."
+    )
 
     for g in range(num_geracoes):
         # Gera a nova população a partir da atual
@@ -230,5 +237,3 @@ if __name__ == "__main__":
     with open("output.json", "w") as f:
         # Salvamos apenas a matriz do campeão
         json.dump({"dna_campeao": populacao_atual[0][0]}, f)
-
-
