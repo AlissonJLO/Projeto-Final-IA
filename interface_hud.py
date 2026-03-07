@@ -1,132 +1,45 @@
 import pygame
-import csv
 import sys
-import json
-import os
+from logica import SimuladorLogica  # Importa o Backend
 
-# --- CONSTANTES VISUAIS E DE MAPA ---
+# --- CONSTANTES VISUAIS (Frontend) ---
 PRETO = (0, 0, 0)
 BRANCO = (255, 255, 255)
-TERRENOS_INFO = {
-    15: {"cor": (202, 202, 202), "custo": 1},  # Plano
-    16: {"cor": (178, 156, 156), "custo": 5},  # Rochoso
-    14: {"cor": (105, 105, 105), "custo": 200},  # Montanhoso
+CORES_TERRENO = {
+    15: (202, 202, 202),  # Plano
+    16: (178, 156, 156),  # Rochoso
+    14: (105, 105, 105),  # Montanhoso
 }
-COR_CASAS = (218, 165, 32)  # Dourado
-COR_INICIO = (255, 50, 50)  # Vermelho
-COR_FIM = (50, 255, 50)  # Verde
+COR_CASAS = (218, 165, 32)
+COR_INICIO = (255, 50, 50)
+COR_FIM = (50, 255, 50)
 TAMANHO_BLOCO = 15
 
 
-# --- LEITURA DOS ARQUIVOS DO ENZO ---
-def carregar_dados():
-    try:
-        with open("input.json", "r", encoding="utf-8") as f:
-            entrada = json.load(f)
-        with open("output.json", "r", encoding="utf-8") as f:
-            saida = json.load(f)
-        return entrada["config_ouros"], entrada["config_bronzes"], saida["dna_campeao"]
-    except Exception as e:
-        print(f"Erro ao carregar os JSONs: {e}")
-        sys.exit(1)
-
-
-# --- GERAÇÃO DE CAMINHO PREDEFINIDO (SEM BUSCA) ---
-def gerar_caminho_simples(waypoints):
-    """
-    Gera um caminho predefinido conectando os pontos em formato de 'L'
-    (horizontal primeiro, depois vertical), ignorando regras de terreno.
-    """
-    caminho = []
-    for i in range(len(waypoints) - 1):
-        atual = waypoints[i]
-        destino = waypoints[i + 1]
-        x, y = atual
-        cx, cy = destino
-
-        # Move no eixo X
-        step_x = 1 if cx > x else -1
-        for nx in range(x, cx, step_x):
-            caminho.append((nx, y))
-        x = cx
-
-        # Move no eixo Y
-        step_y = 1 if cy > y else -1
-        for ny in range(y, cy, step_y):
-            caminho.append((x, ny))
-
-    caminho.append(waypoints[-1])  # Adiciona o destino final
-    return caminho
-
-
-# --- FUNÇÃO PARA SALVAR LOG ---
-def salvar_log_em_arquivo(log_batalhas, tempo_total, energias):
-    try:
-        with open("log_simulacao.txt", "w", encoding="utf-8") as f:
-            f.write("=== RELATÓRIO DA TRAVESSIA DAS 12 CASAS ===\n\n")
-            f.write("LOG DE BATALHAS:\n")
-            for linha in log_batalhas:
-                f.write(linha + "\n")
-            f.write(f"\nTEMPO TOTAL FINAL: {tempo_total:.1f} minutos\n")
-            f.write(f"ENERGIAS FINAIS (Seiya, Shiryu, Hyoga, Shun, Ikki): {energias}\n")
-        print("Arquivo 'log_simulacao.txt' gerado com sucesso!")
-    except Exception as e:
-        print(f"Erro ao salvar o log: {e}")
-
-
-# --- CLASSE PRINCIPAL DA INTERFACE ---
-class InterfaceTatitca:
-    def __init__(self, mapa_csv):
+class InterfaceTatica:
+    def __init__(self, motor_logico):
         pygame.init()
-        self.mapa = []
-        self.pos_inicio = None
-        self.pos_fim = None
-        self._carregar_mapa(mapa_csv)
+        self.motor = motor_logico  # Referência ao simulador
 
-        self.largura_mapa = len(self.mapa[0]) * TAMANHO_BLOCO
-        self.altura_mapa = len(self.mapa) * TAMANHO_BLOCO
+        self.largura_mapa = len(self.motor.mapa[0]) * TAMANHO_BLOCO
+        self.altura_mapa = len(self.motor.mapa) * TAMANHO_BLOCO
         self.largura_painel = 380
 
         self.tela = pygame.display.set_mode(
             (self.largura_mapa + self.largura_painel, max(self.altura_mapa, 600))
         )
-        pygame.display.set_caption("A Travessia das 12 Casas - IA Genética")
+        pygame.display.set_caption("A Travessia das 12 Casas - Visualizador")
 
         self.font_titulo = pygame.font.SysFont("arial", 22, bold=True)
         self.font_texto = pygame.font.SysFont("arial", 16, bold=True)
         self.font_log = pygame.font.SysFont("arial", 14)
         self.clock = pygame.time.Clock()
 
-    def _carregar_mapa(self, csv_file):
-        pos_casas = {}
-        with open(csv_file, "r", encoding="utf-8") as f:
-            leitor = csv.reader(f)
-            for y, linha in enumerate(leitor):
-                linha_ints = []
-                for x, val in enumerate(linha):
-                    val = val.strip()
-                    if not val:
-                        linha_ints.append(None)
-                    else:
-                        v = int(val)
-                        linha_ints.append(v)
-                        # CORREÇÃO DA LEITURA DO MAPA
-                        if v == 0:
-                            self.pos_inicio = (x, y)
-                        elif v == 13:
-                            self.pos_fim = (x, y)  # Objetivo (Verde)
-                        elif 1 <= v <= 12:
-                            pos_casas[v] = (x, y)  # Casas 1 a 12
-                self.mapa.append(linha_ints)
-
-        # Garante que as casas estão ordenadas da 1 à 12
-        self.casas_ordenadas = [pos_casas[i] for i in range(1, 13) if i in pos_casas]
-
-    def desenhar(self, pos_atual, tempo_total, energias, log_batalhas):
+    def desenhar(self):
         self.tela.fill((10, 15, 25))
 
-        # 1. Desenha o Mapa
-        for y, linha in enumerate(self.mapa):
+        # 1. Desenha o Mapa lendo as posições do motor lógico
+        for y, linha in enumerate(self.motor.mapa):
             for x, val in enumerate(linha):
                 cor = BRANCO
                 if val == 0:
@@ -135,8 +48,8 @@ class InterfaceTatitca:
                     cor = COR_FIM
                 elif val is not None and 1 <= val <= 12:
                     cor = COR_CASAS
-                elif val in TERRENOS_INFO:
-                    cor = TERRENOS_INFO[val]["cor"]
+                elif val in CORES_TERRENO:
+                    cor = CORES_TERRENO[val]
                 else:
                     cor = PRETO
 
@@ -162,8 +75,8 @@ class InterfaceTatitca:
                     1,
                 )
 
-        # Desenha Agente (Bolinha Branca representando a equipe)
-        cx, cy = pos_atual
+        # Desenha Agente
+        cx, cy = self.motor.pos_atual
         pygame.draw.circle(
             self.tela,
             (255, 255, 255),
@@ -182,19 +95,19 @@ class InterfaceTatitca:
         )
 
         y_offset = 20
-        titulo = self.font_titulo.render(
-            "STATUS: EXECUÇÃO GENÉTICA", True, (218, 165, 32)
+        self.tela.blit(
+            self.font_titulo.render("STATUS: EXECUÇÃO GENÉTICA", True, (218, 165, 32)),
+            (x_base, y_offset),
         )
-        self.tela.blit(titulo, (x_base, y_offset))
 
         y_offset += 40
-        pct = min(tempo_total / 720.0, 1.0)
+        pct = min(self.motor.tempo_total / 720.0, 1.0)
         cor_tempo = (
             (0, 255, 0) if pct < 0.7 else ((255, 165, 0) if pct < 0.9 else (255, 0, 0))
         )
 
         txt_tempo = self.font_texto.render(
-            f"TEMPO: {tempo_total:.1f} / 720 min", True, BRANCO
+            f"TEMPO: {self.motor.tempo_total:.1f} / 720 min", True, BRANCO
         )
         self.tela.blit(txt_tempo, (x_base, y_offset))
         pygame.draw.rect(self.tela, (50, 50, 50), (x_base, y_offset + 25, 300, 15))
@@ -204,15 +117,15 @@ class InterfaceTatitca:
         pygame.draw.rect(self.tela, BRANCO, (x_base, y_offset + 25, 300, 15), 1)
 
         y_offset += 60
-        txt_energia = self.font_titulo.render(
-            "COSMO DOS CAVALEIROS", True, (218, 165, 32)
+        self.tela.blit(
+            self.font_titulo.render("COSMO DOS CAVALEIROS", True, (218, 165, 32)),
+            (x_base, y_offset),
         )
-        self.tela.blit(txt_energia, (x_base, y_offset))
 
         y_offset += 35
         nomes = ["Seiya", "Shiryu", "Hyoga", "Shun", "Ikki"]
         for i, nome in enumerate(nomes):
-            energia = energias[i]
+            energia = self.motor.energias[i]
             cor_txt = BRANCO if energia > 0 else (100, 100, 100)
             self.tela.blit(
                 self.font_texto.render(f"{nome.upper()}", True, cor_txt),
@@ -226,11 +139,13 @@ class InterfaceTatitca:
             y_offset += 25
 
         y_offset += 20
-        txt_log = self.font_titulo.render("LOG TÁTICO", True, (218, 165, 32))
-        self.tela.blit(txt_log, (x_base, y_offset))
+        self.tela.blit(
+            self.font_titulo.render("LOG TÁTICO", True, (218, 165, 32)),
+            (x_base, y_offset),
+        )
         y_offset += 30
 
-        for log in log_batalhas[-8:]:
+        for log in self.motor.log_batalhas[-8:]:
             self.tela.blit(self.font_log.render(log, True, BRANCO), (x_base, y_offset))
             y_offset += 20
 
@@ -238,30 +153,13 @@ class InterfaceTatitca:
 
 
 def main():
-    # 1. Carrega dados do Enzo
-    ouros, bronzes_poder, dna = carregar_dados()
-    nomes_ouros = list(ouros.keys())
-    nomes_bronzes = list(bronzes_poder.keys())
+    # 1. Instancia a lógica (Backend)
+    motor = SimuladorLogica("coordernadasmapaco.csv", "input.json", "output.json")
 
-    # 2. Inicia Interface e Mapa
-    interface = InterfaceTatitca("coordernadasmapaco.csv")
+    # 2. Instancia a Interface visual passando a lógica (Frontend)
+    interface = InterfaceTatica(motor)
 
-    # Monta a lista de pontos obrigatórios e gera o caminho predefinido (linhas retas)
-    pontos_obrigatorios = (
-        [interface.pos_inicio] + interface.casas_ordenadas + [interface.pos_fim]
-    )
-    caminho = gerar_caminho_simples(pontos_obrigatorios)
-
-    # 3. Variáveis de Simulação
-    tempo_total = 0.0
-    energias = [5, 5, 5, 5, 5]
-    log_batalhas = []
-
-    casa_atual_idx = 0
     rodando = True
-    passo = 0
-    simulacao_concluida = False
-
     print("Iniciando reprodução tática no mapa com caminho predefinido...")
 
     while rodando:
@@ -269,56 +167,16 @@ def main():
             if evento.type == pygame.QUIT:
                 rodando = False
 
-        if passo < len(caminho):
-            pos_atual = caminho[passo]
+        if not motor.simulacao_concluida:
+            # O motor avança e devolve um alerta se rolou batalha
+            status = motor.avancar_passo()
 
-            # Custo de Viagem
-            val_terreno = interface.mapa[pos_atual[1]][pos_atual[0]]
-            custo = TERRENOS_INFO.get(val_terreno, {"custo": 1})["custo"]
-            tempo_total += custo
+            if status["batalha"]:
+                interface.desenhar()  # Atualiza os status caindo
+                pygame.time.wait(1500)  # Pausa dramática da interface
 
-            # Verifica Batalha
-            if pos_atual in interface.casas_ordenadas:
-                idx = interface.casas_ordenadas.index(pos_atual)
-                if idx == casa_atual_idx:
-                    nome_casa = nomes_ouros[idx]
-                    poder_ouro = ouros[nome_casa]
-
-                    # Lê a decisão genética do JSON
-                    luta_dna = dna[idx]
-                    poder_bronze = 0
-                    equipe_nomes = []
-
-                    for i, lutou in enumerate(luta_dna):
-                        if lutou == 1:
-                            energias[i] -= 1
-                            poder_bronze += bronzes_poder[nomes_bronzes[i]]
-                            equipe_nomes.append(nomes_bronzes[i])
-
-                    tempo_batalha = (
-                        poder_ouro / poder_bronze if poder_bronze > 0 else 999
-                    )
-                    tempo_total += tempo_batalha
-
-                    log_batalhas.append(
-                        f"Casa {idx+1} ({nome_casa}): {', '.join(equipe_nomes)} (+{tempo_batalha:.1f}m)"
-                    )
-                    casa_atual_idx += 1
-
-                    # Pausa dramática na batalha
-                    interface.desenhar(pos_atual, tempo_total, energias, log_batalhas)
-                    pygame.time.wait(1500)
-
-            interface.desenhar(pos_atual, tempo_total, energias, log_batalhas)
-            interface.clock.tick(30)
-            passo += 1
-
-        elif not simulacao_concluida:
-            # Acontece apenas uma vez quando chega ao final
-            log_batalhas.append("--- CHEGOU AO GRANDE MESTRE ---")
-            interface.desenhar(pos_atual, tempo_total, energias, log_batalhas)
-            salvar_log_em_arquivo(log_batalhas, tempo_total, energias)
-            simulacao_concluida = True
+        interface.desenhar()
+        interface.clock.tick(30)
 
     pygame.quit()
 

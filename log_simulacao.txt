@@ -1,0 +1,19 @@
+=== RELATÓRIO DA TRAVESSIA DAS 12 CASAS ===
+
+LOG DE BATALHAS:
+Casa 1 (Áries): Seiya, Shiryu (+17.2m)
+Casa 2 (Touro): Shun, Ikki (+23.9m)
+Casa 3 (Gêmeos): Shun, Ikki (+26.1m)
+Casa 4 (Câncer): Seiya, Ikki (+26.9m)
+Casa 5 (Leão): Shiryu, Shun (+28.8m)
+Casa 6 (Virgem): Shiryu, Hyoga (+29.6m)
+Casa 7 (Libra): Seiya, Hyoga (+30.4m)
+Casa 8 (Escorpião): Seiya, Ikki (+34.6m)
+Casa 9 (Sagitário): Hyoga, Shun (+38.0m)
+Casa 10 (Capricórnio): Shiryu, Shun (+38.5m)
+Casa 11 (Aquário): Seiya, Hyoga (+39.3m)
+Casa 12 (Peixes): Shiryu, Hyoga (+44.4m)
+--- CHEGOU AO GRANDE MESTRE ---
+
+TEMPO TOTAL FINAL: 6908.8 minutos
+ENERGIAS FINAIS (Seiya, Shiryu, Hyoga, Shun, Ikki): [0, 0, 0, 0, 1]
