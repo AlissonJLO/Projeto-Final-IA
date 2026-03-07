@@ -21,8 +21,10 @@ class SimuladorLogica:
         pontos_obrigatorios = [self.pos_inicio] + self.casas_ordenadas + [self.pos_fim]
         self.caminho = self._gerar_caminho_simples(pontos_obrigatorios)
 
-        # Variáveis de Estado (A interface vai ler isso)
+        # Variáveis de Estado
         self.tempo_total = 0.0
+        self.tempo_caminho = 0.0 
+        self.tempo_batalhas = 0.0
         self.energias = [5, 5, 5, 5, 5]
         self.log_batalhas = []
         self.passo = 0
@@ -93,6 +95,7 @@ class SimuladorLogica:
         # Custo de Viagem
         val_terreno = self.mapa[self.pos_atual[1]][self.pos_atual[0]]
         custo = self.custos_terreno.get(val_terreno, 1)
+        self.tempo_caminho += custo
         self.tempo_total += custo
 
         # Verifica Batalha
@@ -112,6 +115,7 @@ class SimuladorLogica:
                         equipe_nomes.append(self.nomes_bronzes[i])
 
                 tempo_batalha = poder_ouro / poder_bronze if poder_bronze > 0 else 999
+                self.tempo_batalhas += tempo_batalha
                 self.tempo_total += tempo_batalha
                 self.log_batalhas.append(
                     f"Casa {idx+1} ({nome_casa}): {', '.join(equipe_nomes)} (+{tempo_batalha:.1f}m)"
@@ -125,10 +129,22 @@ class SimuladorLogica:
 
     def salvar_log(self):
         with open("log_simulacao.txt", "w", encoding="utf-8") as f:
-            f.write("=== RELATÓRIO DA TRAVESSIA DAS 12 CASAS ===\n\nLOG DE BATALHAS:\n")
+            f.write("=== RELATÓRIO DA TRAVESSIA DAS 12 CASAS ===\n\n")
+            f.write("LOG DE BATALHAS:\n")
+
             for linha in self.log_batalhas:
                 f.write(linha + "\n")
-            f.write(f"\nTEMPO TOTAL FINAL: {self.tempo_total:.1f} minutos\n")
+
+            f.write("\n===========================================\n")
+            f.write("RESUMO DE DESEMPENHO:\n")
             f.write(
-                f"ENERGIAS FINAIS (Seiya, Shiryu, Hyoga, Shun, Ikki): {self.energias}\n"
+                f"Tempo gasto em batalhas:...... {self.tempo_batalhas:.1f} minutos\n"
             )
+            f.write(
+                f"Tempo gasto no caminho:....... {self.tempo_caminho:.1f} minutos\n"
+            )
+            f.write(f"TEMPO TOTAL DA MISSÃO:........ {self.tempo_total:.1f} minutos\n")
+            f.write("===========================================\n\n")
+            f.write("ESTADO FINAL DOS CAVALEIROS:\n")
+            f.write(f"Energias (Seiya, Shiryu, Hyoga, Shun, Ikki): {self.energias}\n")
+        print("Arquivo 'log_simulacao.txt' gerado detalhadamente com sucesso!")
