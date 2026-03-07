@@ -1,7 +1,6 @@
 import pygame
 import csv
 import sys
-import os
 import heapq
 import json
 
