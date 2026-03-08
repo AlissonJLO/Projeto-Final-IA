@@ -2,25 +2,25 @@
 
 LOG DE BATALHAS:
 Casa 1 (Áries): Shun, Ikki (+21.7m)
-Casa 2 (Touro): Shiryu, Shun (+21.2m)
-Casa 3 (Gêmeos): Seiya, Ikki (+23.1m)
-Casa 4 (Câncer): Hyoga, Shun (+28.0m)
-Casa 5 (Leão): Hyoga, Ikki (+31.2m)
-Casa 6 (Virgem): Seiya, Hyoga (+28.6m)
-Casa 7 (Libra): Shiryu, Ikki (+34.0m)
+Casa 2 (Touro): Seiya, Ikki (+21.2m)
+Casa 3 (Gêmeos): Shiryu, Hyoga (+22.2m)
+Casa 4 (Câncer): Shiryu, Shun (+26.9m)
+Casa 5 (Leão): Hyoga, Shun (+30.0m)
+Casa 6 (Virgem): Seiya, Ikki (+30.8m)
+Casa 7 (Libra): Hyoga, Shun (+34.0m)
 Casa 8 (Escorpião): Seiya, Shiryu (+31.0m)
-Casa 9 (Sagitário): Seiya, Shiryu (+32.8m)
-Casa 10 (Capricórnio): Hyoga, Shun (+40.0m)
-Casa 11 (Aquário): Shiryu, Ikki (+44.0m)
-Casa 12 (Peixes): Seiya, Hyoga (+42.9m)
+Casa 9 (Sagitário): Seiya, Hyoga (+33.9m)
+Casa 10 (Capricórnio): Shiryu, Hyoga (+37.0m)
+Casa 11 (Aquário): Shiryu, Shun (+42.3m)
+Casa 12 (Peixes): Seiya, Ikki (+46.2m)
 --- CHEGOU AO GRANDE MESTRE ---
 
 ===========================================
 RESUMO DE DESEMPENHO:
-Tempo gasto em batalhas:...... 378.4 minutos
+Tempo gasto em batalhas:...... 377.3 minutos
 Tempo gasto no caminho:....... 6531.0 minutos
-TEMPO TOTAL DA MISSÃO:........ 6909.4 minutos
+TEMPO TOTAL DA MISSÃO:........ 6908.3 minutos
 ===========================================
 
 ESTADO FINAL DOS CAVALEIROS:
-Energias (Seiya, Shiryu, Hyoga, Shun, Ikki): [0, 0, 0, 1, 0]
+Energias (Seiya, Shiryu, Hyoga, Shun, Ikki): [0, 0, 0, 0, 1]
