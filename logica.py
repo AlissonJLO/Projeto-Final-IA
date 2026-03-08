@@ -1,6 +1,6 @@
 import csv
 import json
-
+from busca_estrela import a_estrela
 
 class SimuladorLogica:
     def __init__(self, mapa_csv, input_json, output_json):
@@ -64,21 +64,22 @@ class SimuladorLogica:
         return entrada["config_ouros"], entrada["config_bronzes"], saida["dna_campeao"]
 
     def _gerar_caminho_simples(self, waypoints):
-        caminho = []
+
+        caminho_total = []
+
         for i in range(len(waypoints) - 1):
-            atual = waypoints[i]
+
+            inicio = waypoints[i]
             destino = waypoints[i + 1]
-            x, y = atual
-            cx, cy = destino
-            step_x = 1 if cx > x else -1
-            for nx in range(x, cx, step_x):
-                caminho.append((nx, y))
-            x = cx
-            step_y = 1 if cy > y else -1
-            for ny in range(y, cy, step_y):
-                caminho.append((x, ny))
-        caminho.append(waypoints[-1])
-        return caminho
+
+            trecho = a_estrela(self.mapa, inicio, destino)
+
+            if i > 0:
+                trecho = trecho[1:]
+
+            caminho_total.extend(trecho)
+
+        return caminho_total
 
     def avancar_passo(self):
         """Avança 1 bloco. Retorna um dicionário avisando se houve batalha para a interface pausar."""
