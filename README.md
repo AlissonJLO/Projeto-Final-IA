@@ -1,27 +1,55 @@
 # 🌌 A Travessia das 12 Casas - Inteligência Artificial
 
-Este repositório contém a solução do Trabalho Prático da disciplina de Inteligência Artificial. O objetivo do sistema é guiar os Cavaleiros de Bronze pelo mapa do Santuário, gerenciando a navegação pelos terrenos e utilizando um **Algoritmo Genético** para encontrar a melhor combinação de lutas contra os Cavaleiros de Ouro, salvando Atena dentro do limite de 720 minutos e sobrevivendo ao gasto de energia.
+Este repositório contém a solução do Trabalho Prático da disciplina de Inteligência Artificial. O objetivo do sistema é guiar os Cavaleiros de Bronze pelo mapa do Santuário, gerenciando a navegação física pelos terrenos através do **Algoritmo A\*** e comparando duas abordagens distintas para encontrar a melhor combinação de lutas contra os Cavaleiros de Ouro: um **Algoritmo Genético** e uma **Busca em Profundidade (DFS) com Memoization**. O objetivo final é salvar Atena dentro do limite de 720 minutos e sobreviver ao rígido gasto de energia.
 
 ---
 
 ## 🏗️ Estrutura do Projeto
 
-O código foi construído utilizando um padrão inspirado no **MVC (Model-View-Controller)**, separando completamente o "cérebro" (Algoritmo Genético), o "motor de regras" (Backend) e a "visualização" (Frontend).
+O código foi refatorado utilizando uma arquitetura profissional modular, separando completamente o "cérebro" (IA), o "motor de regras" (Engine), os dados (Data) e a "visualização" (GUI).
 
-### ⚙️ Códigos Fonte (Python)
+```text
+Trabalho_Final_IA/
+│
+├── main.py                     # Ponto de entrada do sistema
+├── README.md                   # Documentação
+│
+├── data/                       # Arquivos de Dados e Configurações
+│   ├── coordernadasmapaco.csv  # Matriz 42x42 com terrenos e casas
+│   ├── input.json              # Configurações dinâmicas de atributos e IA
+│   ├── output.json             # DNA gerado autonomamente pela IA
+│   └── log_simulacao.txt       # Relatório de desempenho gerado ao final
+│
+└── src/                        # Código Fonte Principal
+    ├── ai/                     # Módulos de Inteligência Artificial
+    │   ├── algoritmo_genetico.py
+    │   ├── dfs_memoization.py
+    │   └── busca_estrela.py
+    │
+    ├── engine/                 # Motor de Regras de Negócio e Estados
+    │   └── logica.py
+    │
+    └── gui/                    # Interface Visual Pygame
+        └── interface_hud.py
+```
 
-- **`main.py`**: O Orquestrador. É o arquivo principal que o usuário deve rodar. Ele executa o Algoritmo Genético primeiro e, em seguida, inicia a visualização gráfica automaticamente.
-- **`dfs_memoization.py`**: A Busca Exata. Motor de IA que utiliza Busca em Profundidade (DFS) otimizada com Programação Dinâmica (Cache) e operações binárias. Avalia subproblemas sobrepostos para garantir matematicamente o menor tempo de batalha absoluto na casa dos milissegundos.
-- **`algoritmo_genetico.py`**: A Inteligência Artificial. Lê os dados de entrada, gera as populações de estratégias de luta, aplica _crossover_ e mutação, e salva o DNA da equipe com o menor custo de tempo no arquivo de saída.
-- **`logica.py`**: O Motor de Simulação (Backend). Responsável por ler o mapa, traçar as rotas, aplicar os custos de terreno (Plano, Rochoso, Montanhoso) e calcular os danos/energia com base nas decisões da IA.
-- **`interface_hud.py`**: A Interface Gráfica (Frontend). Utiliza a biblioteca Pygame para desenhar um Painel Tático (HUD) limpo e dinâmico, reproduzindo a simulação passo a passo na tela para avaliação.
 
-### 🗂️ Arquivos de Dados
+### ⚙️ Códigos Fonte (`src/`)
 
-- **`coordernadasmapaco.csv`**: Matriz 42x42 representando o mapa do santuário, os tipos de terreno e as localizações exatas das 12 Casas e do Grande Mestre.
-- **`input.json`**: Arquivo de configuração base. Contém os parâmetros de dificuldade (Poder Cósmico) das Casas de Ouro e a força individual de cada Cavaleiro de Bronze.
-- **`output.json`**: Arquivo gerado de forma autônoma pelo `algoritmo_genetico.py`. Guarda a matriz vencedora (DNA) de quem lutará em cada casa.
-- **`log_simulacao.txt`**: Relatório textual detalhado gerado automaticamente ao final da simulação visual, contendo o histórico de combates, tempo de caminhada, tempo de batalhas e energias finais.
+- **`src/ai/busca_estrela.py`**: Implementa o algoritmo A\* (A-Estrela) para navegação espacial, calculando a rota física mais rápida, desviando de montanhas.
+- **`src/ai/dfs_memoization.py`**: Motor de Busca Exata. Utiliza DFS otimizada com Programação Dinâmica (Cache) e operações binárias para avaliar subproblemas sobrepostos e garantir a solução ótima absoluta.
+- **`src/ai/algoritmo_genetico.py`**: Motor de Busca Heurística. Gera populações de estratégias de luta, aplica _crossover_ e mutação, aproximando-se do tempo ótimo de forma evolutiva.
+- **`src/engine/logica.py`**: O Motor de Simulação. Aplica os custos de terreno (Plano, Rochoso, Montanhoso), gerencia os passos no mapa e calcula as penalidades de dano e energia.
+- **`src/gui/interface_hud.py`**: A Interface Gráfica. Utiliza Pygame para desenhar um Painel Tático (HUD) dinâmico com ícones coloridos, reproduzindo a simulação para avaliação visual em tempo real.
+
+---
+
+## 🛠️ Configurações Parametrizáveis (`data/input.json`)
+
+O sistema foi construído para ser dinâmico. Você pode alterar as variáveis do ambiente diretamente no arquivo `data/input.json` **sem precisar mexer no código-fonte**.
+
+- **Forças Cósmicas:** Altere os valores em `config_ouros` e `config_bronzes` para mudar a dificuldade do jogo.
+- **Parâmetros do Genético:** As chaves `"tamanho_pop"` e `"num_geracoes"` definem o esforço computacional do Algoritmo Genético. Modifique-as para testar a diferença entre execuções mais rápidas ou convergências mais precisas (ex: 1000 de população e 100 gerações).
 
 ---
 
@@ -29,19 +57,19 @@ O código foi construído utilizando um padrão inspirado no **MVC (Model-View-C
 
 ### Pré-requisitos
 
-Certifique-se de ter o **Python 3** instalado em sua máquina e a biblioteca `pygame` para a renderização gráfica.
+Certifique-se de ter o **Python 3** instalado em sua máquina e a biblioteca `pygame` para a renderização da interface.
 
-1. Abra o terminal na pasta raiz do projeto.
+1. Abra o terminal na pasta raiz do projeto (`Trabalho_Final_IA`).
 2. Instale as dependências executando:
 
 ```bash
-   pip install pygame
+pip install pygame
 
 ```
 
 ### Iniciando a Simulação
 
-Para rodar a simulação completa (Cálculo Genético + Visualização no Mapa), basta executar o orquestrador:
+Para rodar o projeto completo, execute o orquestrador na raiz da pasta:
 
 ```bash
 python main.py
@@ -50,17 +78,17 @@ python main.py
 
 **O que vai acontecer:**
 
-1. O terminal exibirá um menu perguntando qual motor de IA utilizar para as batalhas (DFS ou Genético).
-2. O motor selecionado calculará a melhor estratégia de combates e exportará a matriz vencedora (o DNA da equipe) para o arquivo output.json.
-3. A interface em Pygame abrirá automaticamente, exibindo o mapa (esquerda) e o Painel Tático (direita).
-4. O agente percorrerá o mapa em velocidade controlada. Ao atingir uma Casa do Zodíaco, a interface fará uma pausa dramática para a batalha, atualizando a energia gasta no painel.
-5. Ao alcançar a Casa do Grande Mestre (quadrado verde), um log de desempenho será gerado localmente (`log_simulacao.txt`) e a simulação será concluída.
+1. O terminal exibirá um **menu interativo** perguntando qual motor tático utilizar para as batalhas: **DFS** ou **Genético**.
+2. O algoritmo calculará a melhor combinação de lutas e a rota física será traçada pelo algoritmo **A\***.
+3. A interface Pygame abrirá automaticamente, exibindo o mapa limpo à esquerda e o Painel de Controle (HUD) à direita.
+4. O agente percorrerá a rota. Ao entrar em uma Casa, ocorrerá uma "pausa dramática" na simulação para o cálculo do embate, e a energia da equipe cairá no painel visualmente.
+5. Ao alcançar o Grande Mestre (objetivo verde), o relatório detalhado será salvo em `data/log_simulacao.txt` e o teste será concluído.
 
 ---
 
 ## 👥 Membros do Grupo
 
-- Alisson Joaquim Lara Oliveira (Responsável pela Interface Gráfica)
-- Enzo (Responsável pelo Algoritmo Genético)
-- Marco Antonio Jobim Filho (Responsável pelo Algoritmo DFS com Memoization)
-- Gabriel Bernardelli Esteves (Responsável pelo Algoritmo de Busca Heurística A*)
+- **Alisson Joaquim Lara Oliveira** – Interface Gráfica (GUI) e Integração Front-end
+- **Enzo Magalhães Campos** – Otimização Heurística (Algoritmo Genético)
+- **Marco Antonio Jobim Filho** – Busca Exata e Programação Dinâmica (DFS com Memoization)
+- **Gabriel Bernardelli Esteves** – Navegação Espacial (Algoritmo A\*)
