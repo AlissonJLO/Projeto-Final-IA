@@ -23,7 +23,7 @@ bronzes = {"Seiya": 1.5, "Shiryu": 1.4, "Hyoga": 1.3, "Shun": 1.2, "Ikki": 1.1}
 def sincronizar_com_gui():
     global ouros, bronzes  # Avisamos o Python que vamos atualizar as globais
     try:
-        with open("input.json", "r", encoding="utf-8") as f:
+        with open("data/input.json", "r", encoding="utf-8") as f:
             dados_gui = json.load(f)
 
             # O segredo está aqui: o método .update() substitui os valores
@@ -229,7 +229,7 @@ def executar_genetico():
     menor_custo = populacao_atual[0][1]
 
     # 5. Salva o melhor cromossomo em um arquivo JSON
-    with open("output.json", "w", encoding="utf-8") as f:
+    with open("data/output.json", "w", encoding="utf-8") as f:
         json.dump({"dna_campeao": melhor_cromossomo}, f)
 
     print(

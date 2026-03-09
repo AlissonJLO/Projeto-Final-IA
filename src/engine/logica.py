@@ -1,6 +1,7 @@
 import csv
 import json
-from busca_estrela import a_estrela
+from src.IA.busca_estrela import a_estrela
+
 
 class SimuladorLogica:
     def __init__(self, mapa_csv, input_json, output_json):
@@ -23,7 +24,7 @@ class SimuladorLogica:
 
         # Variáveis de Estado
         self.tempo_total = 0.0
-        self.tempo_caminho = 0.0 
+        self.tempo_caminho = 0.0
         self.tempo_batalhas = 0.0
         self.energias = [5, 5, 5, 5, 5]
         self.log_batalhas = []
@@ -129,7 +130,7 @@ class SimuladorLogica:
         return {"batalha": teve_batalha}
 
     def salvar_log(self):
-        with open("log_simulacao.txt", "w", encoding="utf-8") as f:
+        with open("data/log_simulacao.txt", "w", encoding="utf-8") as f:
             f.write("=== RELATÓRIO DA TRAVESSIA DAS 12 CASAS ===\n\n")
             f.write("LOG DE BATALHAS:\n")
 

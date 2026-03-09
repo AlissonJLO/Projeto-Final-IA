@@ -1,6 +1,5 @@
 import pygame
-import sys
-from logica import SimuladorLogica  # Importa o Backend
+from src.engine.logica import SimuladorLogica
 
 # --- CONSTANTES VISUAIS (Frontend) ---
 PRETO = (0, 0, 0)
@@ -154,7 +153,9 @@ class InterfaceTatica:
 
 def iniciar_interface():
     # 1. Instancia a lógica (Backend)
-    motor = SimuladorLogica("coordernadasmapaco.csv", "input.json", "output.json")
+    motor = SimuladorLogica(
+        "data/coordernadasmapaco.csv", "data/input.json", "data/output.json"
+    )
 
     # 2. Instancia a Interface visual passando a lógica (Frontend)
     interface = InterfaceTatica(motor)

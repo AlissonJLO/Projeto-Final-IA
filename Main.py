@@ -1,7 +1,7 @@
 import sys
-from algoritmo_genetico import executar_genetico
-from interface_hud import iniciar_interface
-from dfs_memoization import executar_dfs
+from src.IA.algoritmo_genetico import executar_genetico
+from src.gui.interface_hud import iniciar_interface
+from src.IA.dfs_memoization import executar_dfs
 
 if __name__ == "__main__":
     print("=== INICIANDO O SISTEMA DA TRAVESSIA DAS 12 CASAS ===")
