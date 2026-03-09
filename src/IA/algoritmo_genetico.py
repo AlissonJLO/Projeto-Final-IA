@@ -3,30 +3,25 @@ import copy
 import json
 
 ouros = {
-    "Áries" : 50,
-    "Touro" : 55,
-    "Gêmeos" : 60,
-    "Câncer" : 70,
-    "Leão" : 75,
-    "Virgem" : 80,
-    "Libra" : 85,
-    "Escorpião" : 90,
-    "Sagitário" : 95,
-    "Capricórnio" : 100,
-    "Aquário" : 110,
-    "Peixes" : 120
+    "Áries": 50,
+    "Touro": 55,
+    "Gêmeos": 60,
+    "Câncer": 70,
+    "Leão": 75,
+    "Virgem": 80,
+    "Libra": 85,
+    "Escorpião": 90,
+    "Sagitário": 95,
+    "Capricórnio": 100,
+    "Aquário": 110,
+    "Peixes": 120,
 }
 
-bronzes = {
-    "Seiya": 1.5,
-    "Shiryu": 1.4,
-    "Hyoga": 1.3,
-    "Shun": 1.2,
-    "Ikki": 1.1
-}
+bronzes = {"Seiya": 1.5, "Shiryu": 1.4, "Hyoga": 1.3, "Shun": 1.2, "Ikki": 1.1}
 
 tamanho_pop = 1000
 num_geracoes = 100
+
 
 def sincronizar_com_gui():
     global ouros, bronzes, tamanho_pop, num_geracoes  # Avisamos o Python que vamos atualizar as globais
@@ -34,25 +29,26 @@ def sincronizar_com_gui():
         with open("data/input.json", "r", encoding="utf-8") as f:
             dados_gui = json.load(f)
 
-            # O segredo está aqui: o método .update() substitui os valores
-            # sem mudar o tipo da variável ou o nome.
+            # Puxa os dados dos dicionários
             ouros.update(dados_gui["config_ouros"])
             bronzes.update(dados_gui["config_bronzes"])
 
+            # Puxa as variáveis de parâmetro (se não achar no json, mantém o padrão)
             tamanho_pop = dados_gui.get("tamanho_pop", tamanho_pop)
             num_geracoes = dados_gui.get("num_geracoes", num_geracoes)
 
-        print("Dados da GUI sincronizados com sucesso.")
+        print(
+            f"Dados do JSON carregados! População: {tamanho_pop} | Gerações: {num_geracoes}"
+        )
     except Exception as e:
-        # Se o arquivo não existir ou o JSON estiver errado, ele usa o fixo
-        print(f"Aviso: Usando dicionários fixos (Erro: {e})")
+        print(f"Aviso: Falha ao ler JSON. Usando valores padrões (Erro: {e})")
 
-# 1 = Lutando, 0 = Descansando
-# [Seiya, Shiryu, Hyoga, Shun, Ikki]
+
+# [Seiya, Shiryu, Hyoga, Shun, Ikki], 1 = Lutando, 0 = Descansando
 individuo = [
-    [1, 1, 0, 0, 0], # Áries
-    [0, 1, 1, 0, 0], # Touro
-    [0, 0, 1, 1, 0], # Gêmeos
+    [1, 1, 0, 0, 0],  # Áries
+    [0, 1, 1, 0, 0],  # Touro
+    [0, 0, 1, 1, 0],  # Gêmeos
     [0, 0, 0, 1, 1],  # Câncer
     [0, 0, 0, 0, 1],  # Leão
     [1, 1, 0, 0, 0],  # Virgem
@@ -68,11 +64,11 @@ nomes_bronzes = list(bronzes.keys())
 nomes_ouros = list(ouros.keys())
 
 
-def Fitness (individuo):
+def Fitness(individuo):
     tempo_total = 0
-    energia = [5,5,5,5,5]
+    energia = [5, 5, 5, 5, 5]
 
-    for  casas, lutas in enumerate(individuo):  # Itera sobre cada Luta
+    for casas, lutas in enumerate(individuo):  # Itera sobre cada Luta
         poder_ouro = ouros[nomes_ouros[casas]]
         poder_bronze = 0
 
@@ -80,8 +76,10 @@ def Fitness (individuo):
             if cavaleiro == 1:
                 poder_bronze += bronzes[nomes_bronzes[indice]]
                 energia[indice] -= 1
-        if poder_bronze > 0: # Evitar divisão por zero para preservar o programa em caso de have indivíduos com zero lutadores
-            tempo_total += poder_ouro/poder_bronze
+        if (
+            poder_bronze > 0
+        ):  # Evitar divisão por zero para preservar o programa em caso de have indivíduos com zero lutadores
+            tempo_total += poder_ouro / poder_bronze
         else:
             tempo_total += 1000
 
@@ -112,7 +110,7 @@ def Fitness (individuo):
     return 2000 + (erros_energia * 100) + tempo_total
 
 
-def gerar_individuo(): # Essa função e a de baixo são para implementar a população incial
+def gerar_individuo():  # Essa função e a de baixo são para implementar a população incial
     # Cria uma matriz 12x5 com 0 ou 1 aleatórios
     return [[(1 if random.random() < 0.3 else 0) for _ in range(5)] for _ in range(12)]
 
@@ -131,18 +129,22 @@ def pop_inicial(tamanho_populacao):
         populacao_avaliada.append([novo_individuo, nota])
 
     return populacao_avaliada
+
+
 def crossover(pai1, pai2):
     # Sorteia dois pontos aleatórios para fatiar o DNA
     p1 = random.randint(1, 5)
     p2 = random.randint(7, 11)
 
     import copy
+
     # O filho herda: [Pai1(Início), Pai2(Meio), Pai1(Fim)]
-    filho = copy.deepcopy(pai1[:p1]) + \
-            copy.deepcopy(pai2[p1:p2]) + \
-            copy.deepcopy(pai1[p2:])
+    filho = (
+        copy.deepcopy(pai1[:p1]) + copy.deepcopy(pai2[p1:p2]) + copy.deepcopy(pai1[p2:])
+    )
 
     return filho
+
 
 def mutacao(dna, taxa_mutacao=0.05):
     # 'dna' é a matriz 12x5
@@ -157,11 +159,14 @@ def mutacao(dna, taxa_mutacao=0.05):
 
     return dna
 
+
 def reparar_individuo(dna):
     energia_maxima = 5
     for cavaleiro_idx in range(5):
         # Conta em quantas casas esse cavaleiro está lutando
-        lutas = [casa_idx for casa_idx in range(12) if dna[casa_idx][cavaleiro_idx] == 1]
+        lutas = [
+            casa_idx for casa_idx in range(12) if dna[casa_idx][cavaleiro_idx] == 1
+        ]
 
         # Se ele lutou mais que 5, "desligamos" casas aleatórias até chegar em 5
         while len(lutas) > energia_maxima:
@@ -169,6 +174,7 @@ def reparar_individuo(dna):
             dna[casa_para_remover][cavaleiro_idx] = 0
             lutas.remove(casa_para_remover)
     return dna
+
 
 def gerar_proxima_geracao(populacao_atual, tamanho_pop=1000):
     populacao_atual.sort(key=lambda x: x[1])
@@ -198,38 +204,37 @@ def gerar_proxima_geracao(populacao_atual, tamanho_pop=1000):
 
 
 # --- INICIANDO A MÁQUINA ---
+def executar_genetico():
+    print("Calculando rotas e batalhas via Algoritmo Genético (Aguarde)...")
 
-if __name__ == "__main__":
-    sincronizar_com_gui() # Atualiza as forças antes de criar a pop_inicial
+    # 1. Atualiza as forças e os parâmetros lendo o JSON
+    sincronizar_com_gui()
 
-    # Gera a população de teste
+    # 2. Gera a população inicial (AGORA USANDO A VARIÁVEL QUE VEIO DO JSON)
     populacao_atual = pop_inicial(tamanho_pop)
 
-    print(f"Iniciando evolução... População Inicial: {len(populacao_atual)} indivíduos.")
+    # 3. Faz o loop de evolução (AGORA USANDO A VARIÁVEL QUE VEIO DO JSON)
+    for geracao in range(num_geracoes):
+        populacao_atual = gerar_proxima_geracao(populacao_atual, tamanho_pop)
 
-    for g in range(num_geracoes):
-        # Gera a nova população a partir da atual
-        populacao_atual = gerar_proxima_geracao(populacao_atual, tamanho_pop=tamanho_pop)
+        # Mostra o progresso a cada 20% ou na última geração
+        if (geracao + 1) % max(1, (num_geracoes // 5)) == 0 or (
+            geracao + 1
+        ) == num_geracoes:
+            melhor_nota = populacao_atual[0][1]
+            print(
+                f"-> Geração {geracao + 1}/{num_geracoes} concluída. Melhor tempo atual: {melhor_nota:.1f}"
+            )
 
-        # Como a função já ordena, o melhor está sempre no índice 0
-        melhor_tempo = populacao_atual[0][1]
+    # 4. Pega o vencedor final
+    populacao_atual.sort(key=lambda x: x[1])
+    melhor_cromossomo = populacao_atual[0][0]
+    menor_custo = populacao_atual[0][1]
 
-        # Printa o progresso a cada geração
-        print(f"Geração {g:03d} | Melhor Tempo: {melhor_tempo:.2f}")
+    # 5. Salva o melhor cromossomo no novo caminho correto
+    with open("data/output.json", "w", encoding="utf-8") as f:
+        json.dump({"dna_campeao": melhor_cromossomo}, f)
 
-    # --- RESULTADO FINAL ---
-
-    print("\n" + "=" * 30)
-    print("EVOLUÇÃO CONCLUÍDA")
-    print(f"Melhor tempo alcançado: {populacao_atual[0][1]:.2f} min")
-    print("Estratégia (Matriz 12x5):")
-    for linha in populacao_atual[0][0]:
-        print(linha)
-    print("=" * 30)
-
-    # --- EXPORTAR PARA ARQUIVO DE SAÍDA ---
-    with open("output.json", "w") as f:
-        # Salvamos apenas a matriz do campeão
-        json.dump({"dna_campeao": populacao_atual[0][0]}, f)
-
-
+    print(
+        f"\nSucesso! Melhor cromossomo salvo em 'data/output.json'. Custo Final: {menor_custo:.1f}"
+    )
