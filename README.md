@@ -63,4 +63,4 @@ python main.py
 - Alisson Joaquim Lara Oliveira (Responsável pela Interface Gráfica)
 - Enzo (Responsável pelo Algoritmo Genético)
 - Marco Antonio Jobim Filho (Responsável pelo Algoritmo DFS com Memoization)
-- Gabriel
+- Gabriel Bernardelli Esteves (Responsável pelo Algoritmo de Busca Heurística A*)
